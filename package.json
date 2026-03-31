@@ -1,0 +1,12 @@
+{
+  "name": "hospital_management-system",
+  "version": "1.0.0",
+  "description": "A comprehensive hospital management system with backend and frontend components.",
+  "main": "index.js",
+  "scripts": {
+    "dev" : "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
