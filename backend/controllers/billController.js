@@ -1,9 +1,9 @@
-const MedicalRecord = require('../models/medicalRecordModel');
+const Bill = require('../models/billModel');
 
-// GET ALL
-exports.getAllMedicalRecords = async (req, res) => {
+// GET ALL BILLS
+exports.getAllBills = async (req, res) => {
     try {
-        const data = await MedicalRecord.getAll();
+        const data = await Bill.getAllBills();
 
         res.status(200).json({
             status: "success",
@@ -19,21 +19,21 @@ exports.getAllMedicalRecords = async (req, res) => {
     }
 };
 
-// GET BY ID
-exports.getMedicalRecordById = async (req, res) => {
+// GET BILL BY ID
+exports.getBillById = async (req, res) => {
     try {
-        const medicalRecord = await MedicalRecord.getMedicalRecordById(req.params.id);
+        const bill = await Bill.getBillById(req.params.id);
 
-        if (!medicalRecord) {
+        if (!bill) {
             return res.status(404).json({
                 status: "fail",
-                message: "Medical record not found"
+                message: "Bill not found"
             });
         }
 
         res.status(200).json({
             status: "success",
-            data: medicalRecord
+            data: bill
         });
 
     } catch (err) {
@@ -44,14 +44,14 @@ exports.getMedicalRecordById = async (req, res) => {
     }
 };
 
-// CREATE
-exports.createMedicalRecord = async (req, res) => {
+// CREATE BILL
+exports.createBill = async (req, res) => {
     try {
-        const newMedicalRecord = await MedicalRecord.create(req.body);
+        const newBill = await Bill.create(req.body);
 
         res.status(201).json({
             status: "success",
-            data: newMedicalRecord
+            data: newBill
         });
 
     } catch (err) {
@@ -62,15 +62,15 @@ exports.createMedicalRecord = async (req, res) => {
     }
 };
 
-// UPDATE
-exports.updateMedicalRecord = async (req, res) => {
+// UPDATE BILL
+exports.updateBill = async (req, res) => {
     try {
-        const updated = await MedicalRecord.update(req.params.id, req.body);
+        const updated = await Bill.update(req.params.id, req.body);
 
         if (!updated) {
             return res.status(404).json({
                 status: "fail",
-                message: "Medical record not found"
+                message: "Bill not found"
             });
         }
 
@@ -87,21 +87,21 @@ exports.updateMedicalRecord = async (req, res) => {
     }
 };
 
-// DELETE
-exports.deleteMedicalRecord = async (req, res) => {
+// DELETE BILL
+exports.deleteBill = async (req, res) => {
     try {
-        const deleted = await MedicalRecord.delete(req.params.id);
+        const deleted = await Bill.delete(req.params.id);
 
         if (!deleted) {
             return res.status(404).json({
                 status: "fail",
-                message: "Medical record not found"
+                message: "Bill not found"
             });
         }
 
         res.status(200).json({
             status: "success",
-            message: "Medical record deleted"
+            message: "Bill deleted"
         });
 
     } catch (err) {
