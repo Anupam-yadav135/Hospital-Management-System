@@ -11,17 +11,9 @@ const db = mysql.createPool({
   database: process.env.DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0,
-}).promise();   // enables asunc/await 
+  queueLimit: 0,          // if the connection limit gets reached , then the queries will be queued until a connection is available and limit the number of queued connection requests. 0 means no limit
+}).promise();   // enables async/await 
 
-// (async () => {
-//   try {
-//     await db.query('SELECT 1');
-//     console.log('Database connected successfully');
-//   } catch (err) {
-//     console.error('Database connection failed:', err);
-//   }
-// })();
 
 
 module.exports = db;

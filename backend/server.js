@@ -1,12 +1,27 @@
 const express = require('express');
-const  dotenv = require('dotenv');
+const dotenv = require('dotenv');
+const {logger} = require('./middlewares/loggerMiddleware');
 // const db= require('./config/db');
 
-dotenv.config();
+dotenv.config();  // loads environment variables from .env file into process.env 
 
-const app= express();
+const app= express(); // create express app 
 
-app.use(express.json());
+app.use(logger);   // for the logging all the incoming request to the server 
+app.use(express.json());  // for parsing application/json in request body
+
+
+// db coonection test 
+// const db = require('./config/db');
+
+// (async () => {
+//   try {
+//     await db.query('SELECT 1');
+//     console.log('Database connected successfully');
+//   } catch (err) {
+//     console.error(' Database connection failed:', err.message);
+//   }
+// })();
 
 
 // Routes
@@ -27,6 +42,8 @@ app.use(express.json());
 // // Error handling middleware
 // const errorMiddleware = require('./middlewares/errorMiddleware');
 // app.use(errorMiddleware);
+
+
 
 const PORT = process.env.PORT || 5000;
 
