@@ -1,21 +1,22 @@
 const express = require('express');
 const router = express.Router();
-
+const verifyToken = require('../middlewares/authMiddleware');
+const roleAuthorization = require('../middlewares/roleMiddleware');
 const patientController = require('../controllers/patientController');
 
 // Get all patients
-router.get('/', patientController.getAllPatients);
+router.get('/', verifyToken, roleAuthorization('admin','doctor'), patientController.getAllPatients);
 
 // Get patient by ID
-router.get('/:id', patientController.getPatientById);
+router.get('/:id', verifyToken, roleAuthorization('admin' , 'patient'), patientController.getPatientById);
 
 // Create patient
-router.post('/', patientController.createPatient);
+router.post('/',verifyToken , roleAuthorization('admin'),  patientController.createPatient);
 
-// Update patient
-router.put('/:id', patientController.updatePatient);
+// Update patient 
+router.put('/:id', verifyToken ,roleAuthorization('admin'), patientController.updatePatient);
 
 // Delete patient
-router.delete('/:id', patientController.deletePatient);
+router.delete('/:id', verifyToken ,roleAuthorization('admin'), patientController.deletePatient);
 
 module.exports = router;

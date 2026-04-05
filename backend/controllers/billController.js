@@ -1,47 +1,43 @@
 const Bill = require('../models/billModel');
+const { getPatientId } = require('../utils/getIds');
 
 // GET ALL BILLS
-exports.getAllBills = async (req, res) => {
-    try {
-        const data = await Bill.getAllBills();
 
-        res.status(200).json({
-            status: "success",
-            results: data.length,
-            data
-        });
+exports.getMyBills = async (req, res) => {
+  try {
+    const patientId = await getPatientId(req.user.id);
 
-    } catch (err) {
-        res.status(500).json({
-            status: "error",
-            message: err.message
-        });
-    }
+    const bills = await Bill.getByPatientId(patientId);
+
+    res.json({ data: bills });
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 
-// GET BILL BY ID
+
 exports.getBillById = async (req, res) => {
-    try {
-        const bill = await Bill.getBillById(req.params.id);
+  try {
+    const bill = await Bill.getById(req.params.id);
 
-        if (!bill) {
-            return res.status(404).json({
-                status: "fail",
-                message: "Bill not found"
-            });
-        }
-
-        res.status(200).json({
-            status: "success",
-            data: bill
-        });
-
-    } catch (err) {
-        res.status(500).json({
-            status: "error",
-            message: err.message
-        });
+    if (!bill) {
+      return res.status(404).json({ message: "Bill not found" });
     }
+
+    if (req.user.role === 'patient') {
+      const patientId = await getPatientId(req.user.id);
+
+      if (bill.patient_id !== patientId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+    }
+
+    res.json({ data: bill });
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 
 // CREATE BILL

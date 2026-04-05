@@ -14,6 +14,4 @@ const db = mysql.createPool({
   queueLimit: 0,          // if the connection limit gets reached , then the queries will be queued until a connection is available and limit the number of queued connection requests. 0 means no limit
 }).promise();   // enables async/await 
 
-
-
 module.exports = db;

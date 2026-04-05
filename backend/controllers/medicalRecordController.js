@@ -1,4 +1,5 @@
 const MedicalRecord = require('../models/medicalRecordModel');
+const { getPatientId, getDoctorId } = require('../utils/getIds');
 
 // GET ALL
 exports.getAllMedicalRecords = async (req, res) => {
@@ -21,28 +22,38 @@ exports.getAllMedicalRecords = async (req, res) => {
 
 // GET BY ID
 exports.getMedicalRecordById = async (req, res) => {
-    try {
-        const medicalRecord = await MedicalRecord.getMedicalRecordById(req.params.id);
+  try {
+    const record = await MedicalRecord.getById(req.params.id);
 
-        if (!medicalRecord) {
-            return res.status(404).json({
-                status: "fail",
-                message: "Medical record not found"
-            });
-        }
-
-        res.status(200).json({
-            status: "success",
-            data: medicalRecord
-        });
-
-    } catch (err) {
-        res.status(500).json({
-            status: "error",
-            message: err.message
-        });
+    if (!record) {
+      return res.status(404).json({ message: "Record not found" });
     }
+
+    // patient → own record
+    if (req.user.role === 'patient') {
+      const patientId = await getPatientId(req.user.id);
+
+      if (record.patient_id !== patientId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+    }
+
+    // doctor → assigned record
+    if (req.user.role === 'doctor') {
+      const doctorId = await getDoctorId(req.user.id);
+
+      if (record.doctor_id !== doctorId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+    }
+
+    res.json({ data: record });
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
+
 
 // CREATE
 exports.createMedicalRecord = async (req, res) => {

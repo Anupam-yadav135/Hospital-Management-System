@@ -1,12 +1,18 @@
 const Appointment = require('../models/appointmentModel');
 
 
-// 200 - ok successful GET requests 
-// 500 - server error 
-
-// GET ALL
+// GET ALL appointments
 exports.getAllAppointments = async (req, res) => {
     try {
+
+        // Only admin + doctor allowed
+        if (!['admin', 'doctor'].includes(req.user.role)) {
+            return res.status(403).json({
+                status: "fail",
+                message: "Access denied"
+            });
+        }
+
         const data = await Appointment.getAll();
 
         res.status(200).json({
@@ -23,95 +29,186 @@ exports.getAllAppointments = async (req, res) => {
     }
 };
 
+
 // GET BY ID
 exports.getAppointmentById = async (req, res) => {
-    try {
-        const Appointment = await Appointment.getAppointmentById(req.params.id);
+  try {
+    const appointment = await Appointment.getAppointmentById(req.params.id);
 
-        // if no such Appointment id  found in db -> 404 not found 
-        if (!Appointment) {
-            return res.status(404).json({
-                status: "fail",
-                message: "Appointment not found"
-            });
-        }
-        res.status(200).json({
-            status: "success",
-            data: Appointment
-        });
-
-    } catch (err) {
-        res.status(500).json({
-            status: "error",
-            message: err.message
-        });
+    if (!appointment) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Appointment not found"
+      });
     }
+
+    // PATIENT CHECK
+    if (req.user.role === 'patient') {
+      const [rows] = await db.query(
+        'SELECT patient_id FROM Patient WHERE user_id = ?',
+        [req.user.id]
+      );
+
+      const patientId = rows[0]?.patient_id;
+
+      if (appointment.patient_id !== patientId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+    }
+
+    // DOCTOR CHECK
+    if (req.user.role === 'doctor') {
+      const [rows] = await db.query(
+        'SELECT doctor_id FROM Doctor WHERE user_id = ?',
+        [req.user.id]
+      );
+
+      const doctorId = rows[0]?.doctor_id;
+
+      if (appointment.doctor_id !== doctorId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: appointment
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message
+    });
+  }
 };
 
 // CREATE
 exports.createAppointment = async (req, res) => {
-    try {
-        const newAppointment = await Appointment.create(req.body);
+  try {
 
-        res.status(201).json({
-            status: "success",
-            data: newAppointment
-        });
-
-    } catch (err) {
-        res.status(400).json({
-            status: "error",
-            message: err.message
-        });
+    if (req.user.role !== 'patient') {
+      return res.status(403).json({
+        message: "Only patients can create appointments"
+      });
     }
+
+    //Get patient_id from user_id
+    const [rows] = await db.query(
+      'SELECT patient_id FROM Patient WHERE user_id = ?',
+      [req.user.id]
+    );
+
+    const patientId = rows[0]?.patient_id;
+
+    // attach to body
+    req.body.patient_id = patientId;
+
+    const newAppointment = await Appointment.create(req.body);
+
+    res.status(201).json({
+      status: "success",
+      data: newAppointment
+    });
+
+  } catch (err) {
+    res.status(400).json({
+      status: "error",
+      message: err.message
+    });
+  }
 };
 
 // UPDATE
 exports.updateAppointment = async (req, res) => {
-    try {
-        const updated = await Appointment.update(req.params.id, req.body);
+  try {
 
-        if (!updated) {
-            return res.status(404).json({
-                status: "fail",
-                message: "Appointment not found"
-            });
-        }
-
-        res.status(200).json({
-            status: "success",
-            data: updated
-        });
-
-    } catch (err) {
-        res.status(400).json({
-            status: "error",
-            message: err.message
-        });
+    if (!['doctor', 'admin'].includes(req.user.role)) {
+      return res.status(403).json({
+        message: "Access denied"
+      });
     }
+
+    const appointment = await Appointment.getAppointmentById(req.params.id);
+
+    if (!appointment) {
+      return res.status(404).json({
+        message: "Appointment not found"
+      });
+    }
+
+    // Doctor can only update own appointments
+    if (req.user.role === 'doctor') {
+      const [rows] = await db.query(
+        'SELECT doctor_id FROM Doctor WHERE user_id = ?',
+        [req.user.id]
+      );
+
+      const doctorId = rows[0]?.doctor_id;
+
+      if (appointment.doctor_id !== doctorId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+    }
+
+    const updated = await Appointment.update(req.params.id, req.body);
+
+    res.status(200).json({
+      status: "success",
+      data: updated
+    });
+
+  } catch (err) {
+    res.status(400).json({
+      status: "error",
+      message: err.message
+    });
+  }
 };
 
 // DELETE
-exports.deleteAppointment = async (req, res) => {
-    try {
-        const deleted = await Appointment.delete(req.params.id);
+exports.updateAppointment = async (req, res) => {
+  try {
 
-        if (!deleted) {
-            return res.status(404).json({
-                status: "fail",
-                message: "Appointment not found"
-            });
-        }
-
-        res.status(200).json({
-            status: "success",
-            message: "Appointment deleted"
-        });
-
-    } catch (err) {
-        res.status(500).json({
-            status: "error",
-            message: err.message
-        });
+    if (!['doctor', 'admin'].includes(req.user.role)) {
+      return res.status(403).json({
+        message: "Access denied"
+      });
     }
+
+    const appointment = await Appointment.getAppointmentById(req.params.id);
+
+    if (!appointment) {
+      return res.status(404).json({
+        message: "Appointment not found"
+      });
+    }
+
+    // Doctor can only update own appointments
+    if (req.user.role === 'doctor') {
+      const [rows] = await db.query(
+        'SELECT doctor_id FROM Doctor WHERE user_id = ?',
+        [req.user.id]
+      );
+
+      const doctorId = rows[0]?.doctor_id;
+
+      if (appointment.doctor_id !== doctorId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+    }
+
+    const updated = await Appointment.update(req.params.id, req.body);
+
+    res.status(200).json({
+      status: "success",
+      data: updated
+    });
+
+  } catch (err) {
+    res.status(400).json({
+      status: "error",
+      message: err.message
+    });
+  }
 };

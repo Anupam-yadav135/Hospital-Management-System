@@ -1,17 +1,47 @@
 const express = require('express');
-const dotenv = require('dotenv');
+const dotenv = require('dotenv').config();   // loads environment variables from .env file into process.env 
 const {logger} = require('./middlewares/loggerMiddleware');
-// const db= require('./config/db');
+const authRouter = require('./routes/authRoutes');
+const {verifyToken} = require('./middlewares/authMiddleware');
+const authorizeRoles  = require('./middlewares/roleMiddleware');
 
-dotenv.config();  // loads environment variables from .env file into process.env 
 
 const app= express(); // create express app 
-
-app.use(logger);   // for the logging all the incoming request to the server 
 app.use(express.json());  // for parsing application/json in request body
 
+app.use('/api/auth', authRouter);   // for authentication routes (sign, login);
+app.use(logger);   // for the logging all the incoming request to the server 
+
+// const { verifyToken } = require('./middlewares/authMiddleware');
+
+app.get('/protected', verifyToken, (req, res) => {
+  res.json({
+    message: 'Access granted',
+    user: req.user
+  });
+});
+
+
+app.get(
+  '/admin',
+  verifyToken,
+  authorizeRoles('admin'),
+  (req, res) => {
+    res.json({ message: 'Welcome Admin' });
+  }
+);
+
+// app.use('/protected' ,verifyToken ,(req,res,next) =>{
+//      res.status(201).json({
+//         Message: "Access granted",
+//         status: "success",
+//         user :req.user
+//     });
+//     next();
+// });
 
 // db coonection test 
+
 // const db = require('./config/db');
 
 // (async () => {
@@ -43,7 +73,9 @@ app.use(express.json());  // for parsing application/json in request body
 // const errorMiddleware = require('./middlewares/errorMiddleware');
 // app.use(errorMiddleware);
 
+// const bcrypt = require('bcrypt');
 
+// bcrypt.hash('admin12345', 10).then(console.log);
 
 const PORT = process.env.PORT || 5000;
 

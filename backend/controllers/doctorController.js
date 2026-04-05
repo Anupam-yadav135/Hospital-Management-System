@@ -1,6 +1,7 @@
 const Doctor = require('../models/doctorModel');
+const { getDoctorId } = require('../utils/getIds');
 
-// GET ALL
+// GET ALL docotrs 
 exports.getAllDoctors = async (req, res) => {
     try {
         const data = await Doctor.getAllDoctor();
@@ -21,27 +22,27 @@ exports.getAllDoctors = async (req, res) => {
 
 // GET BY ID
 exports.getDoctorById = async (req, res) => {
-    try {
-        const doctor = await Doctor.getDoctorById(req.params.id);
+  try {
+    const doctor = await Doctor.getById(req.params.id);
 
-        if (!doctor) {
-            return res.status(404).json({
-                status: "fail",
-                message: "Doctor not found"
-            });
-        }
-
-        res.status(200).json({
-            status: "success",
-            data: doctor
-        });
-
-    } catch (err) {
-        res.status(500).json({
-            status: "error",
-            message: err.message
-        });
+    if (!doctor) {
+      return res.status(404).json({ message: "Doctor not found" });
     }
+
+    // doctor can only see himself
+    if (req.user.role === 'doctor') {
+      const doctorId = await getDoctorId(req.user.id);
+
+      if (doctor.doctor_id !== doctorId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+    }
+
+    res.json({ data: doctor });
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 
 // CREATE

@@ -1,4 +1,6 @@
 const Patient = require('../models/patientModel');
+const { getPatientId } = require('../utils/getIds');
+
 
 // GET ALL
 exports.getAllPatients = async (req, res) => {
@@ -21,27 +23,26 @@ exports.getAllPatients = async (req, res) => {
 
 // GET BY ID
 exports.getPatientById = async (req, res) => {
-    try {
-        const patient = await Patient.getPatientById(req.params.id);
+  try {
+    const patient = await Patient.getById(req.params.id);
 
-        if (!patient){
-            return res.status(404).json({
-                status: "fail",
-                message: "Patient not found"
-            });
-        }
-
-        res.status(200).json({
-            status: "success",
-            data: patient
-        });
-
-    } catch (err) {
-        res.status(500).json({
-            status: "error",
-            message: err.message
-        });
+    if (!patient) {
+      return res.status(404).json({ message: "Patient not found" });
     }
+
+    if (req.user.role === 'patient') {
+      const patientId = await getPatientId(req.user.id);
+
+      if (patient.patient_id !== patientId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+    }
+
+    res.json({ data: patient });
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 
 // CREATE

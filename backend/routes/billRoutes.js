@@ -1,21 +1,23 @@
 const express = require('express');
 const router = express.Router();
-
+const verifyToken = require('../middlewares/authMiddleware');
+const roleAuthorization = require('../middlewares/roleMiddleware');
 const billController = require('../controllers/billController');
 
+
 // Get all bills
-router.get('/', billController.getAllBills);
+router.get('/', verifyToken , roleAuthorization('admin'), billController.getAllBills);
 
 // Get bill by ID
-router.get('/:id', billController.getBillById);
+router.get('/personalBills/:id', verifyToken , roleAuthorization('admin', 'patient'), billController.getBillById);
 
 // Create bill
-router.post('/', billController.createBill);
+router.post('/',  verifyToken , roleAuthorization('admin'),billController.createBill);
 
 // Update bill
-router.put('/:id', billController.updateBill);
+router.put('/:id', verifyToken , roleAuthorization('admin'), billController.updateBill);
 
 // Delete bill
-router.delete('/:id', billController.deleteBill);
+router.delete('/:id', verifyToken , roleAuthorization('admin') ,  billController.deleteBill);
 
 module.exports = router;
