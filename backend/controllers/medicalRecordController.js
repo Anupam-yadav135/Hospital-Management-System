@@ -1,5 +1,5 @@
 const MedicalRecord = require('../models/medicalRecordModel');
-const { getPatientId, getDoctorId } = require('../utils/getIds');
+const { getPatientId, getDoctorId } = require('../utils/helpers');
 
 // GET ALL
 exports.getAllMedicalRecords = async (req, res) => {

@@ -1,12 +1,19 @@
 const Patient = require('../models/patientModel');
-const { getPatientId } = require('../utils/getIds');
-
+const { getPatientId } = require('../utils/helpers');
 
 // GET ALL
 exports.getAllPatients = async (req, res) => {
     try {
-        const data = await Patient.getAllPatients();
 
+        if (!['admin', 'doctor'].includes(req.user.role)) {
+            return res.status(403).json({
+                status: "fail",
+                message: "Access denied"
+            });
+        }
+
+        const data = await Patient.getAllPatients();
+        
         res.status(200).json({
             status: "success",
             results: data.length,
@@ -21,16 +28,19 @@ exports.getAllPatients = async (req, res) => {
     }
 };
 
+
 // GET BY ID
 exports.getPatientById = async (req, res) => {
   try {
     const patient = await Patient.getById(req.params.id);
 
-    if (!patient) {
+    if (!patient || patient.role !== 'patient') {
       return res.status(404).json({ message: "Patient not found" });
     }
 
-    if (req.user.role === 'patient') {
+    if(req.user.role=='admin' ){
+        // admin can see all so do nothing 
+    }else if (req.user.role === 'patient') {
       const patientId = await getPatientId(req.user.id);
 
       if (patient.patient_id !== patientId) {
@@ -45,70 +55,103 @@ exports.getPatientById = async (req, res) => {
   }
 };
 
+
 // CREATE
-exports.createPatient = async (req, res) => {
-    try {
-        const newPatient = await Patient.create(req.body);
+// exports.createPatient = async (req, res) => {
+//   try {
 
-        res.status(201).json({
-            status: "success",
-            data: newPatient
-        });
+//     if (req.user.role !== 'admin') {
+//       return res.status(403).json({
+//         message: "Only admin can create patient"
+//       });
+//     }
 
-    } catch (err) {
-        res.status(400).json({
-            status: "fail",
-            message: err.message
-        });
-    }
-};
+//     const newPatient = await Patient.create(req.body);
+
+//     res.status(201).json({
+//       status: "success",
+//       data: newPatient
+//     });
+
+//   } catch (err) {
+//     res.status(400).json({
+//       status: "fail",
+//       message: err.message
+//     });
+//   }
+// };
+
 
 // UPDATE
 exports.updatePatient = async (req, res) => {
-    try {
-        const updated = await Patient.update(req.params.id, req.body);
+  try {
 
-        if (!updated) {
-            return res.status(404).json({
-                status: "fail",
-                message: "Patient not found"
-            });
-        }
+    // const patientID = req.params.id;
+    // console.log(patientID);
+    const patient = await Patient.getById(req.params.id);
+    console.log(patient);
 
-        res.status(200).json({
-            status: "success",
-            data: updated
-        });
-
-    } catch (err) {
-        res.status(400).json({
-            status: "fail",
-            message: err.message
-        });
+    if (!patient.patient_id) {
+      return res.status(404).json({
+        message: "Patient not found"
+      });
     }
+
+    // patient → only own
+    if (req.user.role === 'patient') {
+      const patientId = await getPatientId(req.user.id);
+
+      if (patient.patient_id !== patientId) {
+        return res.status(403).json({
+          message: "Access denied"
+        });
+      }
+    }
+
+    // admin → allowed always
+    const updated = await Patient.update(req.params.id, req.body);
+
+    res.status(200).json({
+      status: "success",
+      data: updated
+    });
+
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message
+    });
+  }
 };
+
 
 // DELETE
 exports.deletePatient = async (req, res) => {
-    try {
-        const deleted = await Patient.delete(req.params.id);
+  try {
 
-        if (!deleted) {
-            return res.status(404).json({
-                status: "fail",
-                message: "Patient not found"
-            });
-        }
-
-        res.status(200).json({
-            status: "success",
-            message: "Patient deleted"
-        });
-
-    } catch (err) {
-        res.status(500).json({
-            status: "error",
-            message: err.message
-        });
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        message: "Only admin can delete patients"
+      });
     }
+
+    const deleted = await Patient.delete(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).json({
+        message: "Patient not found"
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Patient deleted"
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message
+    });
+  }
 };

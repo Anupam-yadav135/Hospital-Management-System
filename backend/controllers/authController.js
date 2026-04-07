@@ -4,88 +4,109 @@ const User = require('../models/userModel');
 const db = require('../config/db');
 
 
-// SIGNUP
+// ================= SIGNUP ======================================
 exports.signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // 1. check if user exists
+    // 1. validation
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Name, email and password are required"
+      });
+    }
+
+    // 2. check existing user
     const existingUser = await User.getByEmail(email);
 
     if (existingUser) {
       return res.status(400).json({
-        message: 'User already exists, please login'
+        status: "fail",
+        message: "User already exists, please login"
       });
     }
 
-    // 2. hash password
+    // 3. hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 3. create user (default role = patient)
+    // 4. create user (NO name here)
     const result = await User.create({
-      name,
       email,
       password: hashedPassword,
       role: 'patient'
     });
 
-    // 4. create patient entry
+    const userId = result.insertId;
+
+    // 5. create patient profile
     await db.query(
-      'INSERT INTO Patient (user_id) VALUES (?)',
-      [result.insertId]
+      `INSERT INTO Patient (user_id, name)
+       VALUES (?, ?)`,
+      [userId, name]
     );
 
     res.status(201).json({
-      message: 'Signup successful'
+      status: "success",
+      message: "Signup successful"
     });
 
   } catch (err) {
     res.status(500).json({
-      error: err.message
+      status: "error",
+      message: err.message
     });
   }
 };
 
 
-// LOGIN
+
+// ================= LOGIN =========================================
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // 1. find user
+    // 1. check user
     const user = await User.getByEmail(email);
 
     if (!user) {
       return res.status(404).json({
-        message: 'User not found'
+        status: "fail",
+        message: "User not found"
       });
     }
 
-    // 2. check password
+    // 2. compare password
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
       return res.status(401).json({
-        message: 'Invalid password'
+        status: "fail",
+        message: "Invalid password"
       });
     }
 
     // 3. generate token
     const token = jwt.sign(
-      { id: user.user_id, role: user.role },
+      {
+        id: user.user_id,
+        role: user.role
+      },
       process.env.JWT_SECRET,
-      { expiresIn: '1d' }
+      { expiresIn: "1d" }
     );
 
     // 4. send response
-    res.json({
+    res.status(200).json({
+      status: "success",
       token,
       role: user.role
     });
 
   } catch (err) {
     res.status(500).json({
-      error: err.message
+      status: "error",
+      message: err.message
     });
   }
 };

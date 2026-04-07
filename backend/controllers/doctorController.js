@@ -1,10 +1,10 @@
 const Doctor = require('../models/doctorModel');
-const { getDoctorId } = require('../utils/getIds');
+const { getDoctorId } = require('../utils/helpers');
 
 // GET ALL docotrs 
 exports.getAllDoctors = async (req, res) => {
     try {
-        const data = await Doctor.getAllDoctor();
+        const data = await Doctor.getAllDoctors();
 
         res.status(200).json({
             status: "success",
@@ -21,9 +21,9 @@ exports.getAllDoctors = async (req, res) => {
 };
 
 // GET BY ID
-exports.getDoctorById = async (req, res) => {
+exports.getDoctorById =async (req,res) =>{
   try {
-    const doctor = await Doctor.getById(req.params.id);
+    const doctor = await Doctor.getDoctorById(req.params.id);
 
     if (!doctor) {
       return res.status(404).json({ message: "Doctor not found" });

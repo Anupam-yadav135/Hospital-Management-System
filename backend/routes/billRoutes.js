@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const verifyToken = require('../middlewares/authMiddleware');
+const {verifyToken} = require('../middlewares/authMiddleware');
 const roleAuthorization = require('../middlewares/roleMiddleware');
 const billController = require('../controllers/billController');
 

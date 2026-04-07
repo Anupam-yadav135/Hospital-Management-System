@@ -1,9 +1,9 @@
 const Bill = require('../models/billModel');
-const { getPatientId } = require('../utils/getIds');
+const { getPatientId } = require('../utils/helpers');
 
 // GET ALL BILLS
 
-exports.getMyBills = async (req, res) => {
+exports.getAllBills = async (req, res) => {
   try {
     const patientId = await getPatientId(req.user.id);
 
@@ -49,7 +49,6 @@ exports.createBill = async (req, res) => {
             status: "success",
             data: newBill
         });
-
     } catch (err) {
         res.status(400).json({
             status: "fail",
@@ -62,8 +61,7 @@ exports.createBill = async (req, res) => {
 exports.updateBill = async (req, res) => {
     try {
         const updated = await Bill.update(req.params.id, req.body);
-
-        if (!updated) {
+        if(!updated){
             return res.status(404).json({
                 status: "fail",
                 message: "Bill not found"
@@ -74,7 +72,6 @@ exports.updateBill = async (req, res) => {
             status: "success",
             data: updated
         });
-
     } catch (err) {
         res.status(400).json({
             status: "fail",
