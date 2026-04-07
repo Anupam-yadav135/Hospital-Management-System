@@ -6,18 +6,18 @@ const appointmentController = require('../controllers/appointmentController');
 
 
 // Get all appointments -> admin , doctor 
-router.get('/', verifyToken ,roleAuthorization("admin", "doctor"), appointmentController.getAllAppointments);
+router.get('/getAll', verifyToken ,roleAuthorization("admin", "doctor"), appointmentController.getAllAppointments);
 
 // Get appointment by ID
-router.get('/:id',verifyToken, roleAuthorization("admin", "doctor"), appointmentController.getAppointmentById);
+router.get('/getById/:id',verifyToken, roleAuthorization("admin", "doctor"), appointmentController.getAppointmentById);
 
 // Create appointment
-router.post('/', verifyToken,roleAuthorization("patient"), appointmentController.createAppointment);
+router.post('/createAppointment', verifyToken,roleAuthorization("patient"), appointmentController.createAppointment);
 
 // Update appointment 
-router.put('/:id', verifyToken,roleAuthorization("admin", "doctor"), appointmentController.updateAppointment);
+router.put('/updateAppointment/:id', verifyToken,roleAuthorization("admin", "doctor"), appointmentController.updateAppointment);
 
 // Delete appointment
-router.delete('/:id', verifyToken,roleAuthorization("admin"), appointmentController.deleteAppointment);
+router.delete('/deleteAppointment/:id', verifyToken,roleAuthorization("admin"), appointmentController.deleteAppointment);
 
 module.exports = router;

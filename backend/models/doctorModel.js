@@ -26,33 +26,33 @@ const Doctor = {
   },
 
   // create doctor 
-  create: async (data) => {
-    try {
-      const sql = `
-        INSERT INTO Doctor (name, specialization, phone)
-        VALUES (?, ?, ?)
-      `;
+  // create: async (data) => {
+  //   try {
+  //     const sql = `
+  //       INSERT INTO Doctor (name, specialization, phone)
+  //       VALUES (?, ?, ?)
+  //     `;
 
-      const [result] = await db.query(sql, [
-        data.name,
-        data.specialization,
-        data.phone,
-        // data.email,
-      ]);
+  //     const [result] = await db.query(sql, [
+  //       data.name,
+  //       data.specialization,
+  //       data.phone,
+  //       // data.email,
+  //     ]);
 
-      return result;
+  //     return result;
 
-    } catch (err) {
-      throw err;
-    }
-  },
+  //   } catch (err) {
+  //     throw err;
+  //   }
+  // },
 
   // update doctor data 
   update: async (id, data) => {
     try {
       const sql = `
         UPDATE Doctor
-        SET name=?, specialization=?, phone=?, 
+        SET name=?, specialization=?, phone=?
         WHERE doctor_id=?
       `;
 
@@ -63,13 +63,13 @@ const Doctor = {
         id
       ]);
 
-      if (result.affectedRows === 0) {
+      if(result.affectedRows === 0){
         throw new Error('Doctor not found');
       }
 
       return result;
 
-    } catch (err) {
+    }catch (err){
       throw err;
     }
   },

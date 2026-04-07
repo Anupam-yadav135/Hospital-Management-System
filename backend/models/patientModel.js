@@ -57,35 +57,31 @@ const Patient = {
   // },
 
   // Update patient
-  update: async (id, data) => {
-    try {
-      const sql = `
-        UPDATE Patient
-        SET  age=?, gender=?, phone=?, address=?
-        WHERE patient_id=?
-      `;
+update: async (id, data) => {
+  try {
+    const sql = `
+      UPDATE Patient
+      SET age=?, gender=?, phone=?, address=?
+      WHERE patient_id=?
+    `;
 
-      const [result] = await db.query(sql, [
-        data.name,
-        data.age,
-        data.gender,
-        data.phone,
-        data.email,
-        data.address,
-        id
-      ]);
+    const [result] = await db.query(sql, [
+      data.age || null,
+      data.gender || null,
+      data.phone || null,
+      data.address || null,
+      id
+    ]);
 
-      if (result.affectedRows === 0) {
-        throw new Error('Patient not found');
-      }
-      return result;
-    } catch (err) {
-      throw err;
-    }
-  },
+    return result;
+
+  } catch (err) {
+    throw err;
+  }
+},
 
   // Delete patient
-  deletePatient: async (id) => {
+  delete: async (id) => {
     try {
       const [result] = await db.query(
         'DELETE FROM Patient WHERE patient_id = ?',

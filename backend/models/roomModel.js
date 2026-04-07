@@ -2,7 +2,7 @@ const db = require('../config/db');
 const Room = {
 
   // Get all rooms
-  getAll: async () => {
+  getAllRooms: async () => {
     try {
       const [rows] = await db.query('SELECT * FROM Room');
       return rows;
@@ -13,7 +13,7 @@ const Room = {
 
 
   // Get room by ID
-  getById: async (id) => {
+  getRoomById: async (id) => {
     try {
       const [rows] = await db.query(
         'SELECT * FROM Room WHERE room_id = ?',

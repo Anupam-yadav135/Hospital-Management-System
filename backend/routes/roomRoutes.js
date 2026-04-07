@@ -13,7 +13,7 @@ router.get('/:id', verifyToken, roleAuthorization('admin'), roomController.getRo
 router.post('/', verifyToken, roleAuthorization('admin'), roomController.createRoom);
 
 // Update room
-router.put('/:id',verifyToken,  roleAuthorization('admin'), roomController.updateRoom);
+router.put('/updateRoom/:id',verifyToken,  roleAuthorization('admin'), roomController.updateRoom);
 
 // Delete room
 router.delete('/:id', verifyToken, roleAuthorization('admin'), roomController.deleteRoom);

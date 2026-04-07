@@ -13,5 +13,5 @@ router.post(
   roleAuthorization('admin'),
   adminController.makeDoctor
 );
-
+``
 module.exports = router;

@@ -11,7 +11,7 @@ router.get('/getAllDoctors', verifyToken, doctorController.getAllDoctors);
 router.get('/doc/:id',verifyToken,roleAuthorization('admin', 'doctor') , doctorController.getDoctorById);
 
 // Create Doctor
-router.post('/createDoctor',  verifyToken, roleAuthorization('admin'), doctorController.createDoctor);    
+// router.post('/createDoctor',  verifyToken, roleAuthorization('admin'), doctorController.createDoctor);    
 
 // Update Doctor
 router.put('/updateDoctor/:id', verifyToken , roleAuthorization('admin', 'doctor'), doctorController.updateDoctor);

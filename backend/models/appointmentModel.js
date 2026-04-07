@@ -20,7 +20,7 @@ const Appointment = {
     }
   },
 
-  getById: async (id) => {
+  getAppointmentById: async (id) => {
     try {
       const [rows] = await db.query(
         'SELECT * FROM Appointment WHERE appointment_id = ?',

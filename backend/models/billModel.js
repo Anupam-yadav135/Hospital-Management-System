@@ -5,7 +5,7 @@ const db = require('../config/db');
 const Bill = {
 
   // Get all bills (with JOIN for useful data)
-  getAll: async () => {
+  getAllBills: async () => {
     try{
       const sql = `
         SELECT 
@@ -51,6 +51,7 @@ const Bill = {
         'SELECT * FROM Patient WHERE patient_id = ?',
         [data.patient_id]
       );
+      console.log(patient);
 
       if (patient.length===0){
         throw new Error('Patient not found');
@@ -61,6 +62,7 @@ const Bill = {
         'SELECT * FROM Appointment WHERE appointment_id = ?',
         [data.appointment_id]
       );
+      console.log(appointment);
 
       if(appointment.length===0){
         throw new Error('Appointment not found');

@@ -1,5 +1,5 @@
 const Appointment = require('../models/appointmentModel');
-
+const db = require('../config/db');
 
 // GET ALL appointments
 exports.getAllAppointments= async(req, res)=>{
@@ -90,13 +90,14 @@ exports.createAppointment = async (req, res) => {
       });
     }
 
-    //Get patient_id from user_id
+    //Get patient_id from user_id 
     const [rows] = await db.query(
       'SELECT patient_id FROM Patient WHERE user_id = ?',
       [req.user.id]
     );
 
     const patientId = rows[0]?.patient_id;
+    console.log("Patient ID:", patientId);
 
     // attach to body
     req.body.patient_id = patientId;

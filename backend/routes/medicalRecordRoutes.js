@@ -5,7 +5,7 @@ const roleAuthorization = require('../middlewares/roleMiddleware');
 const medicalRecordController = require('../controllers/medicalRecordController');
 
 // Get all medical records
-router.get('/', verifyToken, roleAuthorization('admin') ,medicalRecordController.getAllMedicalRecords);
+router.get('/getAll', verifyToken, roleAuthorization('admin') ,medicalRecordController.getAllMedicalRecords);
 
 // Get medical record by ID
 router.get('/:id', verifyToken, medicalRecordController.getMedicalRecordById);

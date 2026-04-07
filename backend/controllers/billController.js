@@ -7,7 +7,7 @@ exports.getAllBills = async (req, res) => {
   try {
     const patientId = await getPatientId(req.user.id);
 
-    const bills = await Bill.getByPatientId(patientId);
+    const bills = await Bill.getAllBills(patientId);
 
     res.json({ data: bills });
 
