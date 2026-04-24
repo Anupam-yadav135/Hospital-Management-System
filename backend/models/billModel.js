@@ -5,9 +5,9 @@ const db = require('../config/db');
 const Bill = {
 
   // Get all bills (with JOIN for useful data)
-  getAllBills: async () => {
+  getAllBills: async (patientId = null) => {
     try{
-      const sql = `
+      let sql = `
         SELECT 
           b.*,
           p.name AS patient_name,
@@ -15,11 +15,15 @@ const Bill = {
           r.room_number
         FROM Bill b
         JOIN Patient p ON b.patient_id = p.patient_id
-        JOIN Appointment a ON b.appointment_id = a.appointment_id
+        LEFT JOIN Appointment a ON b.appointment_id = a.appointment_id
         LEFT JOIN Room r ON b.room_id = r.room_id
       `;
 
-      const [rows] = await db.query(sql);
+      if (patientId) {
+        sql += ` WHERE b.patient_id = ?`;
+      }
+
+      const [rows] = await db.query(sql, patientId ? [patientId] : []);
       return rows;
 
     } catch (err) {
@@ -57,15 +61,15 @@ const Bill = {
         throw new Error('Patient not found');
       }
 
-      // Check appointment
-      const [appointment] = await db.query(
-        'SELECT * FROM Appointment WHERE appointment_id = ?',
-        [data.appointment_id]
-      );
-      console.log(appointment);
-
-      if(appointment.length===0){
-        throw new Error('Appointment not found');
+      // Check appointment (if provided)
+      if (data.appointment_id) {
+        const [appointment] = await db.query(
+          'SELECT * FROM Appointment WHERE appointment_id = ?',
+          [data.appointment_id]
+        );
+        if (appointment.length === 0) {
+          throw new Error('Appointment not found');
+        }
       }
 
       // Check room ( if provided)
@@ -89,7 +93,7 @@ const Bill = {
 
       const [result] = await db.query(sql, [
         data.patient_id,
-        data.appointment_id,
+        data.appointment_id || null,
         data.room_id || null,  // if given else input null 
         data.total_amount,
         data.payment_status || 'Pending'  // pending status 

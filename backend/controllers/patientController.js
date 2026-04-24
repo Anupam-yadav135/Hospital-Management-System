@@ -1,5 +1,5 @@
 const Patient = require('../models/patientModel');
-const { getPatientId } = require('../utils/helpers');
+const { getPatientId, getDoctorId } = require('../utils/helpers');
 
 // GET ALL
 exports.getAllPatients = async (req, res) => {
@@ -12,7 +12,13 @@ exports.getAllPatients = async (req, res) => {
             });
         }
 
-        const data = await Patient.getAllPatients();
+        let data;
+        if (req.user.role === 'doctor') {
+            const doctorId = await getDoctorId(req.user.id);
+            data = await Patient.getPatientsByDoctor(doctorId);
+        } else {
+            data = await Patient.getAllPatients();
+        }
         
         res.status(200).json({
             status: "success",
@@ -34,7 +40,7 @@ exports.getPatientById = async (req, res) => {
   try {
     const patient = await Patient.getById(req.params.id);
 
-    if (!patient || patient.role !== 'patient') {
+    if (!patient) {
       return res.status(404).json({ message: "Patient not found" });
     }
 
@@ -57,29 +63,29 @@ exports.getPatientById = async (req, res) => {
 
 
 // CREATE
-// exports.createPatient = async (req, res) => {
-//   try {
+exports.createPatient = async (req, res) => {
+  try {
 
-//     if (req.user.role !== 'admin') {
-//       return res.status(403).json({
-//         message: "Only admin can create patient"
-//       });
-//     }
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        message: "Only admin can create patient"
+      });
+    }
 
-//     const newPatient = await Patient.create(req.body);
+    const newPatient = await Patient.create(req.body);
 
-//     res.status(201).json({
-//       status: "success",
-//       data: newPatient
-//     });
+    res.status(201).json({
+      status: "success",
+      data: newPatient
+    });
 
-//   } catch (err) {
-//     res.status(400).json({
-//       status: "fail",
-//       message: err.message
-//     });
-//   }
-// };
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message
+    });
+  }
+};
 
 
 // UPDATE

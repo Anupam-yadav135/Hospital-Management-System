@@ -14,7 +14,7 @@ router.get('/:id', verifyToken, roleAuthorization('admin' , 'patient'), patientC
 // router.post('/createPatient', verifyToken , roleAuthorization('admin'),  patientController.createPatient);
 
 // Update patient 
-router.put('/updatePatient/:id', verifyToken ,roleAuthorization('admin','patient'), patientController.updatePatient);
+router.put('/updatePatient/:id', verifyToken ,roleAuthorization('admin','patient', 'doctor'), patientController.updatePatient);
 
 // Delete patient
 router.delete('/deletePatient/:id', verifyToken ,roleAuthorization('admin'), patientController.deletePatient);

@@ -6,7 +6,7 @@ const billController = require('../controllers/billController');
 
 
 // Get all bills
-router.get('/', verifyToken , roleAuthorization('admin'), billController.getAllBills);
+router.get('/', verifyToken, roleAuthorization('admin', 'patient'), billController.getAllBills);
 
 // Get bill by ID
 router.get('/personalBills/:id', verifyToken , roleAuthorization('admin', 'patient'), billController.getBillById);

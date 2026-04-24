@@ -13,9 +13,51 @@ const MedicalRecord={
         FROM MedicalRecord mr
         JOIN Patient p ON mr.patient_id = p.patient_id
         JOIN Doctor d ON mr.doctor_id = d.doctor_id
-        JOIN Appointment a ON mr.appointment_id = a.appointment_id`;
+        LEFT JOIN Appointment a ON mr.appointment_id = a.appointment_id`;
 
       const [rows] = await db.query(sql);
+      return rows;
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  getByDoctor: async (doctorId) => {
+    try {
+      const sql = `
+        SELECT 
+          mr.*,
+          p.name AS patient_name,
+          d.name AS doctor_name,
+          a.appointment_date
+        FROM MedicalRecord mr
+        JOIN Patient p ON mr.patient_id = p.patient_id
+        JOIN Doctor d ON mr.doctor_id = d.doctor_id
+        LEFT JOIN Appointment a ON mr.appointment_id = a.appointment_id
+        WHERE mr.doctor_id = ?
+      `;
+      const [rows] = await db.query(sql, [doctorId]);
+      return rows;
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  getByPatient: async (patientId) => {
+    try {
+      const sql = `
+        SELECT 
+          mr.*,
+          p.name AS patient_name,
+          d.name AS doctor_name,
+          a.appointment_date
+        FROM MedicalRecord mr
+        JOIN Patient p ON mr.patient_id = p.patient_id
+        JOIN Doctor d ON mr.doctor_id = d.doctor_id
+        LEFT JOIN Appointment a ON mr.appointment_id = a.appointment_id
+        WHERE mr.patient_id = ?
+      `;
+      const [rows] = await db.query(sql, [patientId]);
       return rows;
     } catch (err) {
       throw err;
@@ -59,14 +101,15 @@ const MedicalRecord={
         throw new Error('Doctor not found');
       }
 
-      // Check appointment
-      const [appointment] = await db.query(
-        'SELECT * FROM Appointment WHERE appointment_id = ?',
-        [data.appointment_id]
-      );
-
-      if (appointment.length === 0) {
-        throw new Error('Appointment not found');
+      // Check appointment (if provided)
+      if (data.appointment_id) {
+        const [appointment] = await db.query(
+          'SELECT * FROM Appointment WHERE appointment_id = ?',
+          [data.appointment_id]
+        );
+        if (appointment.length === 0) {
+          throw new Error('Appointment not found');
+        }
       }
 
       // Insert record
@@ -79,7 +122,7 @@ const MedicalRecord={
       const [result] = await db.query(sql, [
         data.patient_id,
         data.doctor_id,
-        data.appointment_id,
+        data.appointment_id || null,
         data.diagnosis,
         data.prescription,
         data.notes || null   // optional 

@@ -1,0 +1,106 @@
+/* Vanilla CSS Utility Classes to replace missing Tailwind compiler */
+
+/* Layout & Flexbox */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-row { flex-direction: row; }
+.flex-1 { flex: 1 1 0%; }
+.flex-grow { flex-grow: 1; }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.justify-end { justify-content: flex-end; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
+.gap-6 { gap: 1.5rem; }
+
+/* Sizing */
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+.h-screen { height: 100vh; }
+.max-w-md { max-width: 28rem; }
+.min-h-screen { min-height: 100vh; }
+.shrink-0 { flex-shrink: 0; }
+
+/* Spacing */
+.p-2 { padding: 0.5rem; }
+.p-3 { padding: 0.75rem; }
+.p-4 { padding: 1rem; }
+.p-6 { padding: 1.5rem; }
+.p-8 { padding: 2rem; }
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+.py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.pt-10 { padding-top: 2.5rem; }
+.pb-2 { padding-bottom: 0.5rem; }
+.m-6 { margin: 1.5rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.mb-12 { margin-bottom: 3rem; }
+.mt-4 { margin-top: 1rem; }
+.ml-0 { margin-left: 0; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+
+/* Typography */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.font-bold { font-weight: 700; }
+.font-extrabold { font-weight: 800; }
+.font-medium { font-weight: 500; }
+.text-primary { color: var(--primary); }
+.text-muted { color: var(--text-mute); }
+.text-danger { color: var(--critical); }
+.text-white { color: white; }
+.italic { font-style: italic; }
+
+/* Positioning & Display */
+.relative { position: relative; }
+.absolute { position: absolute; }
+.top-0 { top: 0; }
+.top-1\/2 { top: 50%; }
+.left-5 { left: 1.25rem; }
+.transform { transform: translate(var(--tw-translate-x, 0), var(--tw-translate-y, 0)) rotate(var(--tw-rotate, 0)) skewX(var(--tw-skew-x, 0)) skewY(var(--tw-skew-y, 0)) scaleX(var(--tw-scale-x, 1)) scaleY(var(--tw-scale-y, 1)); }
+.-translate-y-1\/2 { --tw-translate-y: -50%; transform: var(--tw-transform); }
+.sticky { position: sticky; }
+.z-10 { z-index: 10; }
+.z-50 { z-index: 50; }
+.overflow-hidden { overflow: hidden; }
+.overflow-y-auto { overflow-y: auto; }
+
+/* Borders & Radii */
+.rounded-xl { border-radius: var(--radius-xl); }
+.rounded-lg { border-radius: var(--radius-lg); }
+.rounded-md { border-radius: var(--radius-md); }
+.rounded-t-3xl { border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem; }
+.border-b { border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: var(--glass-border); }
+
+/* Colors/Backgrounds */
+.bg-primary { background-color: var(--primary); }
+.bg-white { background-color: white; }
+.bg-black { background-color: black; }
+.bg-opacity-50 { background-color: rgba(0,0,0,0.5); }
+.shadow-lg { box-shadow: var(--shadow-layered); }
+.shadow-xl { box-shadow: var(--shadow-hover); }
+
+/* Component Specific Extracted from old CSS */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-sub);
+}
+

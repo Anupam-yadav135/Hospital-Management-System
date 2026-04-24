@@ -5,9 +5,13 @@ const { getPatientId } = require('../utils/helpers');
 
 exports.getAllBills = async (req, res) => {
   try {
-    const patientId = await getPatientId(req.user.id);
-
-    const bills = await Bill.getAllBills(patientId);
+    let bills;
+    if (req.user.role === 'admin') {
+      bills = await Bill.getAllBills();
+    } else {
+      const patientId = await getPatientId(req.user.id);
+      bills = await Bill.getAllBills(patientId);
+    }
 
     res.json({ data: bills });
 

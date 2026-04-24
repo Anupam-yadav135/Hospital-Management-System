@@ -6,11 +6,12 @@ const User = {
   create: async (data) => {
     try {
       const sql = `
-        INSERT INTO User (email, password, role)
-        VALUES (?, ?, ?)
+        INSERT INTO User (name, email, password, role)
+        VALUES (?, ?, ?, ?)
       `;
 
       const [result] = await db.query(sql, [
+        data.name,
         data.email,
         data.password,
         data.role

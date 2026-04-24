@@ -5,8 +5,8 @@ const roleAuthorization = require('../middlewares/roleMiddleware');
 const appointmentController = require('../controllers/appointmentController');
 
 
-// Get all appointments -> admin , doctor 
-router.get('/getAll', verifyToken ,roleAuthorization("admin", "doctor"), appointmentController.getAllAppointments);
+// Get all appointments -> admin, doctor, patient
+router.get('/getAll', verifyToken, roleAuthorization("admin", "doctor", "patient"), appointmentController.getAllAppointments);
 
 // Get appointment by ID
 router.get('/getById/:id',verifyToken, roleAuthorization("admin", "doctor"), appointmentController.getAppointmentById);

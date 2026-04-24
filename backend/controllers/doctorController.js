@@ -6,6 +6,7 @@ exports.getAllDoctors = async (req, res) => {
     try {
         const data = await Doctor.getAllDoctors();
 
+        console.log(`[DEBUG] getAllDoctors API hit - Serving ${data.length} doctors`);
         res.status(200).json({
             status: "success",
             results: data.length,
@@ -46,22 +47,25 @@ exports.getDoctorById =async (req,res) =>{
 };
 
 // CREATE
-// exports.createDoctor = async (req, res) => {
-//     try {
-//         const newDoctor = await Doctor.create(req.body);
+exports.createDoctor = async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: "Only admin can create doctors" });
+        }
+        const newDoctor = await Doctor.create(req.body);
 
-//         res.status(201).json({
-//             status: "success",
-//             data: newDoctor
-//         });
+        res.status(201).json({
+            status: "success",
+            data: newDoctor
+        });
 
-//     } catch (err) {
-//         res.status(400).json({
-//             status: "fail",
-//             message: err.message
-//         });
-//     }
-// };
+    } catch (err) {
+        res.status(400).json({
+            status: "fail",
+            message: err.message
+        });
+    }
+};
 
 // UPDATE 
 exports.updateDoctor = async (req, res) => {

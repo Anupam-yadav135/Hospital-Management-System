@@ -4,12 +4,21 @@ const { getPatientId, getDoctorId } = require('../utils/helpers');
 // GET ALL
 exports.getAllMedicalRecords = async (req, res) => {
     try {
-        const data = await MedicalRecord.getAll();
+        let records;
+        if (req.user.role === 'admin') {
+            records = await MedicalRecord.getAll();
+        } else if (req.user.role === 'doctor') {
+            const doctorId = await getDoctorId(req.user.id);
+            records = await MedicalRecord.getByDoctor(doctorId);
+        } else {
+            const patientId = await getPatientId(req.user.id);
+            records = await MedicalRecord.getByPatient(patientId);
+        }
 
         res.status(200).json({
             status: "success",
-            results: data.length,
-            data
+            results: records.length,
+            data: records
         });
 
     } catch (err) {

@@ -4,7 +4,7 @@ const roomController = require('../controllers/roomController');
 const {verifyToken} = require('../middlewares/authMiddleware');
 const roleAuthorization = require('../middlewares/roleMiddleware');
 // Get all rooms
-router.get('/', verifyToken, roleAuthorization('admin'),  roomController.getAllRooms);
+router.get('/', verifyToken, roleAuthorization('admin', 'doctor', 'patient'), roomController.getAllRooms);
 
 // Get room by ID
 router.get('/:id', verifyToken, roleAuthorization('admin'), roomController.getRoomById);

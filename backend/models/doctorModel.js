@@ -5,7 +5,12 @@ const Doctor = {
     // getting all the doctor
   getAllDoctors: async () => {
     try {
-      const [rows] = await db.query('SELECT * FROM Doctor');
+      const [rows] = await db.query(`
+        SELECT d.*, u.email 
+        FROM Doctor d 
+        LEFT JOIN User u ON d.user_id = u.user_id
+        ORDER BY d.doctor_id DESC
+      `);
       return rows;
     } catch (err) {
       throw err;
@@ -26,26 +31,26 @@ const Doctor = {
   },
 
   // create doctor 
-  // create: async (data) => {
-  //   try {
-  //     const sql = `
-  //       INSERT INTO Doctor (name, specialization, phone)
-  //       VALUES (?, ?, ?)
-  //     `;
+  create: async (data) => {
+    try {
+      const sql = `
+        INSERT INTO Doctor (user_id, name, specialization, phone)
+        VALUES (?, ?, ?, ?)
+      `;
 
-  //     const [result] = await db.query(sql, [
-  //       data.name,
-  //       data.specialization,
-  //       data.phone,
-  //       // data.email,
-  //     ]);
+      const [result] = await db.query(sql, [
+        data.user_id,
+        data.name,
+        data.specialization,
+        data.phone || null
+      ]);
 
-  //     return result;
+      return result;
 
-  //   } catch (err) {
-  //     throw err;
-  //   }
-  // },
+    } catch (err) {
+      throw err;
+    }
+  },
 
   // update doctor data 
   update: async (id, data) => {

@@ -36,25 +36,45 @@ const Patient = {
 },
 
   // Create patient
-  // createPatient: async (data) => {
-  //   try {
-  //     const sql = `
-  //       INSERT INTO Patient (name, age, gender, phone, email, address)
-  //       VALUES (?, ?, ?, ?, ?, ?)`;
+  create: async (data) => {
+    try {
+      const sql = `
+        INSERT INTO Patient (user_id, age, gender, phone, address)
+        VALUES (?, ?, ?, ?, ?)`;
 
-  //     const [result] = await db.query(sql, [
-  //       data.name,
-  //       data.age,
-  //       data.gender,
-  //       data.phone,
-  //       data.email,
-  //       data.address
-  //     ]);
-  //      return result;
-  //   } catch (err) {
-  //     throw err;
-  //   }
-  // },
+      const [result] = await db.query(sql, [
+        data.user_id,
+        data.age,
+        data.gender,
+        data.phone,
+        data.address
+      ]);
+      return result;
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  // Get patients for a specific doctor
+  getPatientsByDoctor: async (doctorId) => {
+    const [rows] = await db.query(`
+      SELECT DISTINCT
+        p.patient_id,
+        p.age,
+        p.gender,
+        p.phone,
+        p.address,
+        u.user_id,
+        u.name,
+        u.email
+      FROM Patient p
+      JOIN User u ON p.user_id = u.user_id
+      JOIN Appointment a ON p.patient_id = a.patient_id
+      WHERE a.doctor_id = ?
+    `, [doctorId]);
+
+    return rows;
+  },
 
   // Update patient
 update: async (id, data) => {

@@ -5,14 +5,23 @@ const db = require('../config/db');
 exports.getAllAppointments= async(req, res)=>{
     try{
 
-        // Only admin + doctor allowed
-        if (!['admin', 'doctor'].includes(req.user.role)) {
-            return res.status(403).json({
-                status: "fail",
-                message: "Access denied"
-            });
+        // Only authenticated users allowed (Check for role existence)
+        if (!req.user || !req.user.role) {
+            return res.status(401).json({ message: "Not authenticated" });
         }
-        const data = await Appointment.getAll();
+        let data;
+        if (req.user.role === 'doctor') {
+            const [rows] = await db.query('SELECT doctor_id FROM Doctor WHERE user_id = ?', [req.user.id]);
+            
+            const doctorId = rows[0]?.doctor_id;
+            data = await Appointment.getByDoctor(doctorId);
+        } else if (req.user.role === 'patient') {
+            const [rows] = await db.query('SELECT patient_id FROM Patient WHERE user_id = ?', [req.user.id]);
+            const patientId = rows[0]?.patient_id;
+            data = await Appointment.getByPatient(patientId);
+        } else {
+            data = await Appointment.getAll();
+        }
 
         res.status(200).json({
             status: "success",

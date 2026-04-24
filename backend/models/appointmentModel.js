@@ -8,13 +8,51 @@ const Appointment = {
           p.name AS patient_name,
           d.name AS doctor_name
         FROM Appointment a
-        JOIN Patient p ON a.patient_id = p.patient_id
-        JOIN Doctor d ON a.doctor_id = d.doctor_id
+        LEFT JOIN Patient p ON a.patient_id = p.patient_id
+        LEFT JOIN Doctor d ON a.doctor_id = d.doctor_id
       `;
 
       const [rows] = await db.query(sql);
       return rows;
 
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  getByDoctor: async (doctorId) => {
+    try {
+      const sql = `
+        SELECT 
+          a.*,
+          p.name AS patient_name,
+          d.name AS doctor_name
+        FROM Appointment a
+        LEFT JOIN Patient p ON a.patient_id = p.patient_id
+        LEFT JOIN Doctor d ON a.doctor_id = d.doctor_id
+        WHERE a.doctor_id = ?
+      `;
+      const [rows] = await db.query(sql, [doctorId]);
+      return rows;
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  getByPatient: async (patientId) => {
+    try {
+      const sql = `
+        SELECT 
+          a.*,
+          p.name AS patient_name,
+          d.name AS doctor_name
+        FROM Appointment a
+        LEFT JOIN Patient p ON a.patient_id = p.patient_id
+        LEFT JOIN Doctor d ON a.doctor_id = d.doctor_id
+        WHERE a.patient_id = ?
+      `;
+      const [rows] = await db.query(sql, [patientId]);
+      return rows;
     } catch (err) {
       throw err;
     }
